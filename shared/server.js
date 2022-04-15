@@ -5,6 +5,7 @@ import { resolve } from "path";
 import { RequestError } from "./error.js";
 import { mimeTypes } from "./mime.js";
 import { __dirname } from "./path.js";
+import { ViewSet } from "./viewset.js";
 
 const { NODE_ENV = "development", PORT = 4040 } = process.env;
 
@@ -17,8 +18,11 @@ export class Server {
   }
 
   async handleRequest(req, res) {
+    const now = +new Date();
+    console.info(`[${now}] > ${req.method} ${req.url}`);
+
     try {
-      const handler = this.matchHandler(req);
+      const handler = await this.matchHandler(req);
       if (handler) {
         this.sendResponse(res, await handler(req, res));
       } else {
@@ -28,20 +32,24 @@ export class Server {
       console.error(error);
 
       if (error instanceof RequestError) {
-        this.sendResponse(res, error);
+        this.sendError(res, error);
       } else {
-        this.sendResponse(res, new RequestError(500));
+        this.sendError(res, new RequestError(500));
       }
     }
+
+    const end = +new Date();
+    console.info(`[${end}] < ${req.method} ${req.url} (${end - now}ms)`);
   }
 
-  matchHandler(req) {
+  async matchHandler(req) {
     const url = new URL(`https://${req.headers.host}${req.url}`);
     const handlers = this.views[req.method] ?? [];
 
     for (const [path, handler] of Object.entries(handlers)) {
       const match = this.matchPath(path, url.pathname);
       if (match) {
+        req.body = await this.extractRequestBody(req);
         req.params = match;
         req.query = Object.fromEntries(new URLSearchParams(url.search));
         return handler;
@@ -76,9 +84,45 @@ export class Server {
     return params;
   }
 
+  async extractRequestBody(req) {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve) => {
+      try {
+        const buffers = [];
+
+        for await (const chunk of req) {
+          buffers.push(chunk);
+        }
+
+        const data = Buffer.concat(buffers).toString();
+        resolve(new Map(new URLSearchParams(data)));
+      } catch (error) {
+        resolve(null);
+      }
+    });
+  }
+
   sendResponse(res, response) {
-    res.writeHead(response.status, { "Content-Type": "text/html" });
-    res.end(response.body);
+    if (!res.headersSent) {
+      const { status, body, ...head } = response;
+      res.writeHead(status, { "Content-Type": "text/html", ...head });
+      res.end(body);
+    }
+  }
+
+  async sendError(res, error) {
+    const { status, message } = error;
+    const viewset = new ViewSet();
+    const response = await viewset.html({
+      status: status,
+      template: "error",
+      context: {
+        status,
+        message,
+      },
+    });
+
+    return this.sendResponse(res, response);
   }
 
   async serveStatics(req, res) {
@@ -92,7 +136,6 @@ export class Server {
         `../public/${req.url.replace(/^\/public/u, "")}`
       );
       const [ext] = req.url.split(".").slice(-1);
-      console.log(path, ext);
       res.writeHead(200, {
         "Content-Type": mimeTypes[ext] ?? mimeTypes.txt,
         "Content-Length": (await stat(path)).size,
@@ -103,7 +146,7 @@ export class Server {
     } catch (error) {
       console.error(error);
       if (error instanceof RequestError) {
-        this.sendResponse(res, error);
+        this.sendError(res, error);
       } else {
         res.writeHead(500, { "Content-Type": mimeTypes.txt });
         res.end();
@@ -122,7 +165,9 @@ export class Server {
   listen() {
     this.server.listen(PORT, () => {
       if (NODE_ENV === "development") {
-        console.log(`Server listening on http://localhost:${PORT}`);
+        console.info(
+          `[${+new Date()}] Server listening on http://localhost:${PORT}`
+        );
       }
     });
   }

@@ -11,10 +11,18 @@ const __dirname = dirname(__filename);
 const templates = {};
 
 export class ViewSet {
-  async html({ status, template, context }) {
+  get routes() {
+    return {};
+  }
+
+  async html({ status = 200, template, context }) {
     const view = await this.getCompiledTemplate(template);
     const body = view(context);
     return { status, body };
+  }
+
+  async redirect({ to }) {
+    return { status: 301, Location: to };
   }
 
   async getCompiledTemplate(template) {

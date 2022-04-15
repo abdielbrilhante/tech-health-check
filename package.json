@@ -10,7 +10,12 @@
   "license": "Apache-2.0",
   "description": "",
   "dependencies": {
-    "handlebars": "^4.7.7"
+    "bcrypt": "^5.0.1",
+    "branca": "^0.4.0",
+    "handlebars": "^4.7.7",
+    "knex": "^1.0.7",
+    "nanoid": "^3.3.2",
+    "pg": "^8.7.3"
   },
   "devDependencies": {
     "eslint": "^8.13.0",

@@ -1,7 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;900&display=swap");
 
 body {
-  font-family: "Azeret Mono", monospace, sans-serif;
+  color: var(--color-text);
+  font-family: "Chivo", sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -10,6 +11,7 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
+  margin: 0;
 }
 
 button,
@@ -35,5 +37,10 @@ h3,
 h4,
 h5,
 h6 {
-  overflow-wrap: break-word;
+  /* overflow-wrap: break-word; */
+}
+
+:root {
+  --color-text: #303440;
+  --color-primary: #2e5bcc;
 }

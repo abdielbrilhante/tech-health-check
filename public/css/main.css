@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700;800&display=swap");
+
+body {
+  font-family: "Azeret Mono", monospace, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}

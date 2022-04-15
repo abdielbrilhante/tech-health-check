@@ -1,5 +1,4 @@
-import { readFile } from "fs";
-import { promisify } from "util";
+import { readFile } from "fs/promises";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -10,7 +9,6 @@ const __dirname = dirname(__filename);
 
 // Cache
 const templates = {};
-const readFileAsync = promisify(readFile);
 
 export class ViewSet {
   async html({ status, template, context }) {
@@ -21,7 +19,7 @@ export class ViewSet {
 
   async getCompiledTemplate(template) {
     if (!templates[template]) {
-      const content = await readFileAsync(
+      const content = await readFile(
         resolve(__dirname, `../templates/${template}.hbs`)
       );
 

@@ -1,27 +1,28 @@
-import http from "http";
+import { createServer } from "http";
+import { createReadStream } from "fs";
+import { stat } from "fs/promises";
+import { resolve } from "path";
 import { RequestError } from "./error.js";
+import { mimeTypes } from "./mime.js";
+import { __dirname } from "./path.js";
 
 const { NODE_ENV = "development", PORT = 4040 } = process.env;
 
 export class Server {
   constructor() {
-    this.server = http.createServer((req, res) => this.handleRequest(req, res));
-    this.views = {};
+    this.server = createServer((req, res) => this.handleRequest(req, res));
+    this.views = {
+      "GET /*": this.serveStatics.bind(this),
+    };
   }
 
   async handleRequest(req, res) {
-    if (req.url === "/favicon.ico") {
-      this.sendResponse(res, new RequestError(404));
-      return;
-    }
-
     try {
       const handler = this.matchHandler(req);
-
       if (handler) {
         this.sendResponse(res, await handler(req, res));
       } else {
-        throw new RequestError(405);
+        await this.serveStatics(req, res);
       }
     } catch (error) {
       console.error(error);
@@ -51,10 +52,14 @@ export class Server {
   }
 
   matchPath(path, input) {
+    if (path === input) {
+      return {};
+    }
+
     const pathSegments = path.split("/").filter(Boolean);
     const inputSegments = input.split("/").filter(Boolean);
 
-    if (pathSegments.length > inputSegments) {
+    if (pathSegments.length !== inputSegments && !input.includes("*")) {
       return null;
     }
 
@@ -74,6 +79,36 @@ export class Server {
   sendResponse(res, response) {
     res.writeHead(response.status, { "Content-Type": "text/html" });
     res.end(response.body);
+  }
+
+  async serveStatics(req, res) {
+    try {
+      if (!req.url.includes(".")) {
+        throw new RequestError(404);
+      }
+
+      const path = resolve(
+        __dirname,
+        `../public/${req.url.replace(/^\/public/u, "")}`
+      );
+      const [ext] = req.url.split(".").slice(-1);
+      console.log(path, ext);
+      res.writeHead(200, {
+        "Content-Type": mimeTypes[ext] ?? mimeTypes.txt,
+        "Content-Length": (await stat(path)).size,
+      });
+
+      const readStream = createReadStream(path);
+      readStream.pipe(res);
+    } catch (error) {
+      console.error(error);
+      if (error instanceof RequestError) {
+        this.sendResponse(res, error);
+      } else {
+        res.writeHead(500, { "Content-Type": mimeTypes.txt });
+        res.end();
+      }
+    }
   }
 
   viewset(viewset) {

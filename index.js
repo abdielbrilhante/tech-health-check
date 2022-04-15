@@ -1,5 +1,5 @@
-import { Server } from './shared/server.js';
-import { PublicViewSet } from './views/public.js';
+import { Server } from "./shared/server.js";
+import { PublicViewSet } from "./views/public.js";
 
 const server = new Server();
 

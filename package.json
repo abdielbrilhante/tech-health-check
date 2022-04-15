@@ -13,6 +13,13 @@
     "handlebars": "^4.7.7"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "eslint": "^8.13.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-node": "^11.1.0",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.6.2"
+  },
+  "engines": {
+    "node": ">=14.17.0"
   }
 }

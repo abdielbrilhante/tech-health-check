@@ -1,9 +1,9 @@
-import { readFile } from 'fs';
-import { promisify } from 'util';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { readFile } from "fs";
+import { promisify } from "util";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 
-import Handlebars from 'handlebars';
+import Handlebars from "handlebars";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,10 +22,10 @@ export class ViewSet {
   async getCompiledTemplate(template) {
     if (!templates[template]) {
       const content = await readFileAsync(
-        resolve(__dirname, `../templates/${template}.hbs`),
+        resolve(__dirname, `../templates/${template}.hbs`)
       );
 
-      templates[template] = Handlebars.compile(content.toString('utf8'));
+      templates[template] = Handlebars.compile(content.toString("utf8"));
     }
 
     return templates[template];

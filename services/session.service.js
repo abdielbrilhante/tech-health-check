@@ -3,9 +3,9 @@ import { RequestError } from "../shared/error.js";
 import * as validate from "../shared/validate.js";
 
 export class SessionService {
-  async filterSessions() {
+  async filterSessions(filters) {
     const repository = new SessionRepository();
-    const sessions = await repository.getFiltered();
+    const sessions = await repository.getFiltered(filters ?? new Map());
     return sessions.map((session) => ({
       ...session,
       when: session.when.toLocaleString(),

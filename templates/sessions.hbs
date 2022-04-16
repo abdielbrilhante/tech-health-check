@@ -85,8 +85,13 @@
         <form action="/sessions" method="post">
           <label for="tech">
             <div>Stack level</div>
-            <select id="stack" name="stack" type="text">
-              <option value="" selected="">All</option>
+            <select
+              id="stack"
+              name="stack"
+              type="text"
+              value="{{values.stack}}"
+            >
+              <option value="">All</option>
               <option value="frontend">Frontend</option>
               <option value="backend">Backend</option>
               <option value="mixed">Mixed</option>
@@ -99,28 +104,56 @@
               name="tech"
               type="text"
               placeholder="Language or framework"
+              value="{{values.tech}}"
             />
           </label>
           <label for="team">
             <div>Team</div>
-            <input id="team" name="team" type="text" placeholder="Team name" />
+            <input
+              id="team"
+              name="team"
+              type="text"
+              placeholder="Team name"
+              value="{{values.team}}"
+            />
+          </label>
+          <label for="client">
+            <div>Client</div>
+            <input
+              id="client"
+              name="client"
+              type="text"
+              placeholder="Client name"
+              value="{{values.client}}"
+            />
           </label>
           <label for="lead">
             <div>Lead</div>
             <input
-              id="lead"
-              name="lead"
+              id="leadEmail"
+              name="leadEmail"
               type="email"
               placeholder="Team lead email"
+              value="{{values.leadEmail}}"
             />
           </label>
           <label for="dateFrom">
             <div>From date</div>
-            <input id="dateFrom" name="dateFrom" type="datetime-local" />
+            <input
+              id="dateFrom"
+              name="dateFrom"
+              type="datetime-local"
+              value="{{values.dateFrom}}"
+            />
           </label>
           <label for="dateTo">
             <div>Until date</div>
-            <input id="dateTo" name="dateTo" type="datetime-local" />
+            <input
+              id="dateTo"
+              name="dateTo"
+              type="datetime-local"
+              value="{{values.dateTo}}"
+            />
           </label>
           <button type="submit">
             Search

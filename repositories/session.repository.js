@@ -5,8 +5,37 @@ import { react } from "../data/react.js";
 const templates = { react };
 
 export class SessionRepository extends Repository {
-  getFiltered() {
-    return this.knex("sessions");
+  getFiltered(filters) {
+    const query = this.knex("sessions").whereNull("archived");
+
+    if (filters.get("stack")) {
+      query.andWhere("stack", "=", filters.get("stack"));
+    }
+
+    if (filters.get("dateFrom")) {
+      query.andWhere("when", ">=", filters.get("dateFrom"));
+    }
+
+    if (filters.get("dateTo")) {
+      query.andWhere("when", "<=", filters.get("dateTo"));
+    }
+
+    const applyTextSearch = (field) => {
+      if (filters.get(field)) {
+        query.whereRaw(
+          `lower(${field}) like ?`,
+          `%${filters.get(field).toLowerCase()}%`
+        );
+      }
+    };
+
+    applyTextSearch("tech");
+    applyTextSearch("team");
+    applyTextSearch("client");
+    applyTextSearch("leadName");
+    applyTextSearch("leadEmail");
+
+    return query;
   }
 
   create(data) {

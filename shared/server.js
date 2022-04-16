@@ -98,7 +98,7 @@ export class Server {
         const data = Buffer.concat(buffers).toString();
         resolve(new Map(new URLSearchParams(data)));
       } catch (error) {
-        resolve(null);
+        resolve(new Map());
       }
     });
   }

@@ -12,14 +12,15 @@ export class SessionViewSet extends ViewSet {
   }
 
   // GET|POST /sessions
-  async sessionList() {
+  async sessionList(req) {
     const service = new SessionService();
-    const sessions = await service.filterSessions();
+    const sessions = await service.filterSessions(req.body);
     return this.html({
       status: 200,
       template: "sessions",
       context: {
         sessions,
+        values: Object.fromEntries(req.body),
       },
     });
   }

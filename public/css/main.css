@@ -50,5 +50,7 @@ a {
   --color-gray-light: #f9f9f9;
   --color-primary: #0e3bbc;
   --color-primary-light: #e7edfd;
-  --color-border: #e6e6e6;
+  --color-error: #bc3b0e;
+  --color-border: #e0e0e0;
+  --size-max-width: 1200px;
 }

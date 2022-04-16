@@ -18,10 +18,16 @@ label select {
   width: 100%;
 }
 
-label input {
+label input:not([type="radio"]):not([type="checkbox"]) {
   height: 2.5rem;
   border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 0 0.75rem;
   width: 100%;
+}
+
+.validation-error {
+  color: var(--color-error);
+  font-size: 0.75rem;
+  margin-top: 2px;
 }

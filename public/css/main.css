@@ -37,11 +37,18 @@ h3,
 h4,
 h5,
 h6 {
-  /* overflow-wrap: break-word; */
+  overflow-wrap: break-word;
+}
+
+a {
+  text-decoration: none;
 }
 
 :root {
-  --color-text: #303440;
-  --color-primary: #2e5bcc;
-  --color-border: #d0d4e0;
+  --color-text: #444444;
+  --color-text-light: #747474;
+  --color-gray-light: #f9f9f9;
+  --color-primary: #0e3bbc;
+  --color-primary-light: #e7edfd;
+  --color-border: #e6e6e6;
 }

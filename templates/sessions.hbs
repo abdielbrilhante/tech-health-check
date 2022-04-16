@@ -1,0 +1,132 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tech Health Check</title>
+
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/form.css" />
+    <link rel="stylesheet" href="/css/button.css" />
+    <link rel="stylesheet" href="/css/sessions.css" />
+    <script src="/js/select-table.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Sessions ({{sessions.length}})</h1>
+      <a href="/sessions/new">
+        Schedule session
+      </a>
+    </header>
+    <main>
+      <form action="/sessions/compare" method="post">
+        <table cellspacing="0">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Team</th>
+              <th>Lead</th>
+              <th>Tech</th>
+              <th>When</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each sessions}}
+              <tr>
+                <td>
+                  <input
+                    type="checkbox"
+                    name="select_{{this.id}}"
+                    id="select_{{this.id}}"
+                  />
+                  <td class="multi-row">
+                    <div>
+                      <a href="/sessions/overview/{{this.id}}">
+                        <b>{{this.team}}</b>
+                      </a>
+                    </div>
+                    <div>
+                      {{this.client}}
+                    </div>
+                  </td>
+                </td>
+                <td class="multi-row">
+                  <div>
+                    {{this.leadName}}
+                  </div>
+                  <div>
+                    {{this.leadEmail}}
+                  </div>
+                </td>
+                <td class="multi-row">
+                  <div>{{this.tech}}</div>
+                  <div>{{this.stack}}</div>
+                </td>
+                <td>
+                  {{this.when}}
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        {{#if sessions.length}}
+          <div class="selection-manager">
+            <button type="button">
+              Select all
+            </button>
+            <button type="submit">
+              Compare selected
+            </button>
+          </div>
+        {{/if}}
+      </form>
+      <aside>
+        <h2>Filters</h2>
+        <form action="/sessions" method="post">
+          <label for="tech">
+            <div>Stack level</div>
+            <select id="stack" name="stack" type="text">
+              <option value="" selected="">All</option>
+              <option value="frontend">Frontend</option>
+              <option value="backend">Backend</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </label>
+          <label for="tech">
+            <div>Tech</div>
+            <input
+              id="tech"
+              name="tech"
+              type="text"
+              placeholder="Language or framework"
+            />
+          </label>
+          <label for="team">
+            <div>Team</div>
+            <input id="team" name="team" type="text" placeholder="Team name" />
+          </label>
+          <label for="lead">
+            <div>Lead</div>
+            <input
+              id="lead"
+              name="lead"
+              type="email"
+              placeholder="Team lead email"
+            />
+          </label>
+          <label for="dateFrom">
+            <div>From date</div>
+            <input id="dateFrom" name="dateFrom" type="datetime-local" />
+          </label>
+          <label for="dateTo">
+            <div>Until date</div>
+            <input id="dateTo" name="dateTo" type="datetime-local" />
+          </label>
+          <button type="submit">
+            Search
+          </button>
+        </form>
+      </aside>
+    </main>
+  </body>
+</html>

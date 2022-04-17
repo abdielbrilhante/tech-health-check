@@ -51,6 +51,9 @@ a {
   --color-primary: #0e3bbc;
   --color-primary-light: #e7edfd;
   --color-error: #bc3b0e;
+  --color-red: #bc3b6e;
+  --color-orange: #cc6b2e;
+  --color-green: #2c7b4e;
   --color-border: #e0e0e0;
-  --size-max-width: 1200px;
+  --size-max-width: 1024px;
 }

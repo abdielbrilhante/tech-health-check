@@ -68,7 +68,7 @@ export class Server {
     const pathSegments = path.split("/").filter(Boolean);
     const inputSegments = input.split("/").filter(Boolean);
 
-    if (pathSegments.length !== inputSegments && !input.includes("*")) {
+    if (pathSegments.length !== inputSegments.length && !input.includes("*")) {
       return null;
     }
 

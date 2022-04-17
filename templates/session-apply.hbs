@@ -1,0 +1,110 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tech Health Check</title>
+
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/form.css" />
+    <link rel="stylesheet" href="/css/button.css" />
+    <link rel="stylesheet" href="/css/session-apply.css" />
+  </head>
+  <body>
+    <header>
+      <h1>{{session.tech}} health check - {{session.team}}</h1>
+    </header>
+    <main>
+      <form action="/sessions/apply/{{session.id}}" method="post">
+        {{#each session.topics}}
+          <div class="topic">
+            <h2>{{this.topic}}</h2>
+            <p>{{this.description}}</p>
+            <div class="questions">
+              <div class="question">
+                <h3>Our current approach is...</h3>
+                <div class="options">
+                  <label class="radio-button" for="state_bad_{{@index}}">
+                    <input
+                      type="radio"
+                      name="state_{{@index}}"
+                      value="bad"
+                      id="state_bad_{{@index}}"
+                    />
+                    <div>
+                      Not great
+                    </div>
+                  </label>
+                  <label class="radio-button" for="state_neutral_{{@index}}">
+                    <input
+                      type="radio"
+                      name="state_{{@index}}"
+                      value="neutral"
+                      id="state_neutral_{{@index}}"
+                    />
+                    <div>
+                      Good enough?
+                    </div>
+                  </label>
+                  <label class="radio-button" for="state_good_{{@index}}">
+                    <input
+                      type="radio"
+                      name="state_{{@index}}"
+                      value="good"
+                      id="state_good_{{@index}}"
+                    />
+                    <div>
+                      Really good
+                    </div>
+                  </label>
+                </div>
+              </div>
+              <div class="question">
+                <h3>Our trend seems to be...</h3>
+                <div class="options">
+                  <label class="radio-button" for="trend_bad_{{@index}}">
+                    <input
+                      type="radio"
+                      name="trend_{{@index}}"
+                      value="bad"
+                      id="trend_bad_{{@index}}"
+                    />
+                    <div>
+                      Going down
+                    </div>
+                  </label>
+                  <label class="radio-button" for="trend_neutral_{{@index}}">
+                    <input
+                      type="radio"
+                      name="trend_{{@index}}"
+                      value="neutral"
+                      id="trend_neutral_{{@index}}"
+                    />
+                    <div>
+                      Fairly stable
+                    </div>
+                  </label>
+                  <label class="radio-button" for="trend_good_{{@index}}">
+                    <input
+                      type="radio"
+                      name="trend_{{@index}}"
+                      value="good"
+                      id="trend_good_{{@index}}"
+                    />
+                    <div>
+                      Going up
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+
+        <button type="submit">
+          Send
+        </button>
+      </form>
+    </main>
+  </body>
+</html>

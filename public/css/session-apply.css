@@ -1,0 +1,106 @@
+body {
+  padding: 1.5rem;
+}
+
+header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: var(--size-max-width);
+}
+
+header h1 {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+}
+
+main {
+  margin: 1.5rem auto 0;
+  max-width: var(--size-max-width);
+}
+
+.topic {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.topic + .topic {
+  margin-top: 1.5rem;
+}
+
+.topic > h2 {
+  font-size: 1.125rem;
+}
+
+.topic > p {
+  font-size: 0.875rem;
+}
+
+.questions {
+  display: flex;
+  margin-top: 0.75rem;
+}
+
+.question {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  flex: 1;
+  padding: 1rem;
+}
+
+.question + .question {
+  margin-left: 0.75rem;
+}
+
+.question > h3 {
+  font-size: 1rem;
+}
+
+.options {
+  display: flex;
+  margin-top: 0.5rem;
+}
+
+.radio-button > div {
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.875rem;
+  font-weight: 600;
+  height: 2.5rem;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.radio-button + .radio-button {
+  margin-left: 0.5rem;
+}
+
+.radio-button > input {
+  display: none;
+}
+
+.radio-button > input[value="bad"] + div {
+  color: var(--color-red);
+}
+
+.radio-button > input[value="neutral"] + div {
+  color: var(--color-orange);
+}
+
+.radio-button > input[value="good"] + div {
+  color: var(--color-green);
+}
+
+.radio-button > input:checked + div {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+button[type="submit"] {
+  margin-top: 1.5rem;
+}

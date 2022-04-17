@@ -38,6 +38,10 @@ export class SessionRepository extends Repository {
     return query;
   }
 
+  getById(id) {
+    return this.knex("sessions").where("id", "=", id).first();
+  }
+
   create(data) {
     const { template, ...payload } = data;
     const { stack, tech, topics } = templates[template];
@@ -46,6 +50,13 @@ export class SessionRepository extends Repository {
       stack,
       tech,
       topics: JSON.stringify(topics),
+    });
+  }
+
+  async saveAnswers(sessionId, answers) {
+    await this.knex("answers").insert({
+      sessionId: sessionId,
+      answers: JSON.stringify(answers),
     });
   }
 }

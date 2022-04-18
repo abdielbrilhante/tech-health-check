@@ -9,21 +9,25 @@ export class SessionViewSet extends ViewSet {
 
   get routes() {
     return {
-      "GET /sessions": this.sessionList,
-      "POST /sessions": this.sessionList,
-      "GET /sessions/new": this.sessionForm,
-      "POST /sessions/new": this.saveSession,
-      "GET /sessions/apply/:id": this.applyHealthCheck,
-      "POST /sessions/apply/:id": this.saveAnswers,
-      "GET /sessions/success": this.sessionSuccess,
-      "GET /sessions/manage/:id": this.sessionOverview,
-      "POST /sessions/manage/:id": this.updateSession,
+      public: {
+        "GET /sessions/apply/:id": this.applyHealthCheck,
+        "POST /sessions/apply/:id": this.saveAnswers,
+        "GET /sessions/success": this.sessionSuccess,
+      },
+      protected: {
+        "GET /sessions": this.sessionList,
+        "POST /sessions": this.sessionList,
+        "GET /sessions/new": this.sessionForm,
+        "POST /sessions/new": this.saveSession,
+        "GET /sessions/manage/:id": this.sessionOverview,
+        "POST /sessions/manage/:id": this.updateSession,
+      },
     };
   }
 
   // GET|POST /sessions
   async sessionList(req) {
-    const sessions = await this.service.filterSessions(req.body);
+    const sessions = await this.service.filterSessions(req.body, req.user);
     return this.html({
       status: 200,
       template: "sessions",
@@ -49,7 +53,7 @@ export class SessionViewSet extends ViewSet {
   // POST /sessions
   async saveSession(req) {
     try {
-      await this.service.save(req.body);
+      await this.service.save(req.body, req.user);
       return this.redirect({ to: "/sessions" });
     } catch (error) {
       if (error.status === 400 && error.data) {
@@ -89,11 +93,8 @@ export class SessionViewSet extends ViewSet {
 
   // GET /sessions/manage/:id
   async sessionOverview(req) {
-    const session = await this.service.getById(req.params.id);
-    const stats = await this.service.computeStats(
-      session,
-      req.query.get("sort")
-    );
+    const session = await this.service.getById(req.params.id, req.user);
+    const stats = await this.service.computeStats(session, req.user);
     return this.html({
       status: 200,
       template: "session-manager",

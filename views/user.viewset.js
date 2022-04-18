@@ -4,8 +4,10 @@ import { UserService } from "../services/user.service.js";
 export class UserViewSet extends ViewSet {
   get routes() {
     return {
-      "GET /login": this.loginPage,
-      "POST /login": this.authenticate,
+      public: {
+        "GET /login": this.loginPage,
+        "POST /login": this.authenticate,
+      },
     };
   }
 

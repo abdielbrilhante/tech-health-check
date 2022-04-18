@@ -7,17 +7,20 @@ export class SessionService {
     this.repository = new SessionRepository();
   }
 
-  async filterSessions(filters) {
-    const sessions = await this.repository.getFiltered(filters ?? new Map());
+  async filterSessions(filters, user) {
+    const sessions = await this.repository.getFiltered(
+      filters ?? new Map(),
+      user
+    );
     return sessions.map((session) => ({
       ...session,
       when: session.when.toLocaleString(),
     }));
   }
 
-  async getById(id) {
+  async getById(id, user) {
     const session = await this.repository.getById(id);
-    if (!session) {
+    if (!session || (user && session.ownerId !== user.id)) {
       throw new RequestError(404);
     }
 
@@ -25,7 +28,7 @@ export class SessionService {
     return session;
   }
 
-  async save(form) {
+  async save(form, user) {
     const errors = validate.required(form, [
       "template",
       "team",
@@ -39,7 +42,10 @@ export class SessionService {
       throw new RequestError(400, Object.fromEntries(errors));
     }
 
-    await this.repository.create(Object.fromEntries(form));
+    await this.repository.create({
+      ...Object.fromEntries(form),
+      ownerId: user.id,
+    });
   }
 
   async saveAnswers(sessionId, form) {

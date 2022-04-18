@@ -7,6 +7,7 @@ import { RequestError } from "./error.js";
 import { mimeTypes } from "./mime.js";
 import { __dirname } from "./path.js";
 import { ViewSet } from "./viewset.js";
+import { UserService } from "../services/user.service.js";
 
 const { NODE_ENV = "development", PORT = 4040 } = process.env;
 
@@ -24,7 +25,9 @@ export class Server {
 
     try {
       const handler = await this.matchHandler(req);
-      if (handler) {
+      if (handler?.protected && !req.user) {
+        this.sendResponse(res, { status: 301, Location: "/" });
+      } else if (handler) {
         this.sendResponse(res, await handler(req, res));
       } else {
         await this.serveStatics(req, res);
@@ -40,7 +43,9 @@ export class Server {
     }
 
     const end = +new Date();
-    console.info(`[${end}] < ${req.method} ${req.url} (${end - now}ms)`);
+    console.info(
+      `[${end}] < ${req.method} ${req.url} (${res.statusCode}) (${end - now}ms)`
+    );
   }
 
   async matchHandler(req) {
@@ -53,6 +58,11 @@ export class Server {
         req.body = await this.extractRequestBody(req);
         req.params = match;
         req.query = new URLSearchParams(url.search);
+        req.cookies = new URLSearchParams(
+          req.headers.cookie.replace(/; /g, "&")
+        );
+
+        req.user = await new UserService().requestUser(req.cookies.get("auth"));
         return handler;
       }
     }
@@ -156,10 +166,13 @@ export class Server {
   }
 
   viewset(viewset) {
-    for (const [endpoint, handler] of Object.entries(viewset.routes)) {
-      const [method, path] = endpoint.split(" ");
-      this.views[method] = this.views[method] ?? {};
-      this.views[method][path] = handler.bind(viewset);
+    for (const [level, routes] of Object.entries(viewset.routes)) {
+      for (const [endpoint, handler] of Object.entries(routes)) {
+        const [method, path] = endpoint.split(" ");
+        this.views[method] = this.views[method] ?? {};
+        this.views[method][path] = handler.bind(viewset);
+        this.views[method][path].protected = level === "protected";
+      }
     }
   }
 

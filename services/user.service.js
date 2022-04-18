@@ -7,6 +7,21 @@ import { UserRepository } from "../repositories/user.repository.js";
 const branca = Branca(process.env.JWT_SALT);
 
 export class UserService {
+  constructor() {
+    this.repository = new UserRepository();
+  }
+
+  async requestUser(token) {
+    try {
+      const email = branca.decode(token).toString("utf8");
+      const user = await this.repository.getByEmail(email);
+      return user;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
   async authenticate(form) {
     const errors = [];
 
@@ -22,8 +37,7 @@ export class UserService {
       throw new RequestError(422, Object.fromEntries(errors));
     }
 
-    const repository = new UserRepository();
-    const user = await repository.getByEmail(form.get("email"));
+    const user = await this.repository.getByEmail(form.get("email"));
     if (!user) {
       throw new RequestError(401);
     }

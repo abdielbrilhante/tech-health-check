@@ -3,7 +3,9 @@ import { ViewSet } from "../shared/viewset.js";
 export class PublicViewSet extends ViewSet {
   get routes() {
     return {
-      "GET /": this.homepage,
+      public: {
+        "GET /": this.homepage,
+      },
     };
   }
 

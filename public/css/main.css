@@ -46,6 +46,7 @@ a {
 
 :root {
   --color-text: #444444;
+  --color-text-dim: #44444460;
   --color-text-light: #747474;
   --color-gray-light: #f9f9f9;
   --color-primary: #0e3bbc;
@@ -56,4 +57,26 @@ a {
   --color-green: #2c7b4e;
   --color-border: #e0e0e0;
   --size-max-width: 1024px;
+}
+
+body {
+  padding: 1.5rem;
+}
+
+header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: var(--size-max-width);
+}
+
+header h1 {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+}
+
+main {
+  margin: 1.5rem auto 0;
+  max-width: var(--size-max-width);
 }

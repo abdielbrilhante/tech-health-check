@@ -1,26 +1,7 @@
-body {
-  padding: 1.5rem;
-}
-
-header {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin: 0 auto;
-  max-width: var(--size-max-width);
-}
-
-header h1 {
-  color: var(--color-primary);
-  font-size: 1.25rem;
-}
-
 main {
   align-items: flex-start;
   display: flex;
   gap: 1.25rem;
-  margin: 1.5rem auto 0;
-  max-width: var(--size-max-width);
 }
 
 main > form {
@@ -44,50 +25,10 @@ main > form {
   margin-left: 0.5rem;
 }
 
-table {
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  width: 100%;
-}
-
-table tr[data-selected] td {
-  background-color: var(--color-gray-light);
-}
-
-table th {
-  text-align: left;
-}
-
-table th,
-table td {
-  padding: 1rem;
-}
-
-table th {
-  border-bottom: 1px solid var(--color-border);
-}
-
-table tbody tr:not(:first-child) td {
-  border-top: 1px solid var(--color-border);
-}
-
-table tbody td:first-of-type {
-  width: 3rem;
-}
-
 table input[type="checkbox"] {
   cursor: pointer;
   height: 1rem;
   width: 1rem;
-}
-
-table td {
-  vertical-align: top;
-}
-
-table td a {
-  color: var(--color-primary);
 }
 
 td:nth-child(4) div:last-child {

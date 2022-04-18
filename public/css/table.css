@@ -1,0 +1,39 @@
+table {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+table tr[data-selected] td {
+  background-color: var(--color-gray-light);
+}
+
+table th {
+  text-align: left;
+}
+
+table th,
+table td {
+  padding: 1rem;
+}
+
+table th {
+  border-bottom: 1px solid var(--color-border);
+}
+
+table tbody tr:not(:first-child) td {
+  border-top: 1px solid var(--color-border);
+}
+
+table tbody td:first-of-type {
+  width: 3rem;
+}
+
+table td {
+  vertical-align: top;
+}
+
+table td a {
+  color: var(--color-primary);
+}

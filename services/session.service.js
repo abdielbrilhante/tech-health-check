@@ -21,6 +21,7 @@ export class SessionService {
       throw new RequestError(404);
     }
 
+    session.when = session.when.toLocaleString()
     return session;
   }
 
@@ -56,5 +57,40 @@ export class SessionService {
     }
 
     await this.repository.saveAnswers(sessionId, answers);
+  }
+
+  async computeStats(session) {
+    const increments = { bad: 0, neutral: 50, good: 100 };
+
+    const answers = await this.repository.sessionAnswers(session);
+    const stats = session.topics.map((item) => ({
+      topic: item.topic,
+      state: 0,
+      stateCount: 0,
+      trend: 0,
+      trendCount: 0,
+    }));
+
+    for (const answerSet of answers) {
+      for (const [index, answer] of answerSet.answers.entries()) {
+        console.log(answer, increments[answer.state]);
+        stats[index].state += increments[answer.state] ?? 0;
+        stats[index].trend += increments[answer.trend] ?? 0;
+
+        stats[index].stateCount += increments[answer.state] ? 1 : 0;
+        stats[index].trendCount += increments[answer.trend] ? 1 : 0;
+      }
+    }
+
+    for (const stat of stats) {
+      stat.state = Math.round(stat.stateCount ? stat.state / stat.stateCount : 0);
+      stat.trend = Math.round(stat.trendCount ? stat.trend / stat.trendCount : 0);
+
+      stat.stateLabel = stat.state === 100 ? 'M' : stat.state;
+      stat.trendLabel = stat.trend === 100 ? 'M' : stat.trend;
+      stat.hasAnswers = stat.stateCount > 0 || stat.trendCount > 0;
+    }
+
+    return stats;
   }
 }

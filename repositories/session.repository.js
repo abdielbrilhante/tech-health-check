@@ -35,7 +35,7 @@ export class SessionRepository extends Repository {
     applyTextSearch("leadName");
     applyTextSearch("leadEmail");
 
-    return query;
+    return query.orderBy("created", "desc");
   }
 
   getById(id) {
@@ -58,5 +58,9 @@ export class SessionRepository extends Repository {
       sessionId: sessionId,
       answers: JSON.stringify(answers),
     });
+  }
+
+  sessionAnswers(session) {
+    return this.knex('answers').where('sessionId', '=', session.id);
   }
 }

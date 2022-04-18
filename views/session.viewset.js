@@ -16,6 +16,8 @@ export class SessionViewSet extends ViewSet {
       "GET /sessions/apply/:id": this.applyHealthCheck,
       "POST /sessions/apply/:id": this.saveAnswers,
       "GET /sessions/success": this.sessionSuccess,
+      "GET /sessions/manage/:id": this.sessionOverview,
+      "POST /sessions/manage/:id": this.updateSession,
     };
   }
 
@@ -84,4 +86,22 @@ export class SessionViewSet extends ViewSet {
       template: "session-success",
     });
   }
+
+  // GET /sessions/manage/:id
+  async sessionOverview(req) {
+    const session = await this.service.getById(req.params.id);
+    const stats = await this.service.computeStats(session);
+    console.log(stats);
+    return this.html({
+      status: 200,
+      template: "session-manager",
+      context: {
+        session: session,
+        stats: stats,
+      },
+    });
+  }
+
+  // POST /sessions/manage/:id
+  async updateSession() { }
 }

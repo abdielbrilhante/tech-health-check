@@ -1,0 +1,58 @@
+label {
+  margin-top: 1.25rem;
+}
+
+button[type="submit"] {
+  margin-top: 1.5rem;
+}
+
+tr:not([data-hasanswers]) td {
+  background-color: var(--color-gray-light);
+  color: var(--color-text-dim);
+}
+
+table th:not(:first-of-type) {
+  text-align: center;
+}
+
+table td {
+  vertical-align: middle;
+}
+
+td span.state {
+  align-items: center;
+  color: white;
+  display: inline-flex;
+  border-radius: 1.125rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  justify-content: center;
+  margin: 0 auto;
+  height: 2.25rem;
+  width: 2.25rem;
+}
+
+td span.trend {
+  display: inline-block;
+  height: 2.25rem;
+  margin: 0 auto;
+  position: relative;
+  width: 2.25rem;
+}
+
+td span.trend span {
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+@media print {
+  h1,
+  label,
+  button {
+    display: none;
+  }
+}

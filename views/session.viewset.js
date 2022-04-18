@@ -90,8 +90,10 @@ export class SessionViewSet extends ViewSet {
   // GET /sessions/manage/:id
   async sessionOverview(req) {
     const session = await this.service.getById(req.params.id);
-    const stats = await this.service.computeStats(session);
-    console.log(stats);
+    const stats = await this.service.computeStats(
+      session,
+      req.query.get("sort")
+    );
     return this.html({
       status: 200,
       template: "session-manager",
@@ -103,5 +105,5 @@ export class SessionViewSet extends ViewSet {
   }
 
   // POST /sessions/manage/:id
-  async updateSession() { }
+  async updateSession() {}
 }

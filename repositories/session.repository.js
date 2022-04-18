@@ -61,6 +61,6 @@ export class SessionRepository extends Repository {
   }
 
   sessionAnswers(session) {
-    return this.knex('answers').where('sessionId', '=', session.id);
+    return this.knex("answers").where("sessionId", "=", session.id);
   }
 }

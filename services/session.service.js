@@ -21,7 +21,7 @@ export class SessionService {
       throw new RequestError(404);
     }
 
-    session.when = session.when.toLocaleString()
+    session.when = session.when.toLocaleString();
     return session;
   }
 
@@ -73,7 +73,6 @@ export class SessionService {
 
     for (const answerSet of answers) {
       for (const [index, answer] of answerSet.answers.entries()) {
-        console.log(answer, increments[answer.state]);
         stats[index].state += increments[answer.state] ?? 0;
         stats[index].trend += increments[answer.trend] ?? 0;
 
@@ -83,11 +82,15 @@ export class SessionService {
     }
 
     for (const stat of stats) {
-      stat.state = Math.round(stat.stateCount ? stat.state / stat.stateCount : 0);
-      stat.trend = Math.round(stat.trendCount ? stat.trend / stat.trendCount : 0);
+      stat.state = Math.round(
+        stat.stateCount ? stat.state / stat.stateCount : 0
+      );
+      stat.trend = Math.round(
+        stat.trendCount ? stat.trend / stat.trendCount : 0
+      );
 
-      stat.stateLabel = stat.state === 100 ? 'M' : stat.state;
-      stat.trendLabel = stat.trend === 100 ? 'M' : stat.trend;
+      stat.stateLabel = stat.state === 100 ? "M" : stat.state;
+      stat.trendLabel = stat.trend === 100 ? "M" : stat.trend;
       stat.hasAnswers = stat.stateCount > 0 || stat.trendCount > 0;
     }
 

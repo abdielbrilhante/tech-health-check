@@ -52,7 +52,7 @@ export class Server {
       if (match) {
         req.body = await this.extractRequestBody(req);
         req.params = match;
-        req.query = Object.fromEntries(new URLSearchParams(url.search));
+        req.query = new URLSearchParams(url.search);
         return handler;
       }
     }

@@ -20,7 +20,11 @@ export class SessionService {
 
   async getById(id, user) {
     const session = await this.repository.getById(id);
-    if (!session || (user && session.ownerId !== user.id)) {
+    if (
+      !session ||
+      (user && session.ownerId !== user.id) ||
+      (!user && !session.open)
+    ) {
       throw new RequestError(404);
     }
 
@@ -46,6 +50,20 @@ export class SessionService {
       ...Object.fromEntries(form),
       ownerId: user.id,
     });
+  }
+
+  async closeById(id, form, user) {
+    const session = await this.repository.getById(id);
+    if (!session || (user && session.ownerId !== user.id)) {
+      throw new RequestError(404);
+    }
+
+    const data = { ...Object.fromEntries(form), open: false };
+    await this.repository.updateById(id, data);
+
+    Object.assign(session, data);
+    session.when = session.when.toLocaleString();
+    return session;
   }
 
   async saveAnswers(sessionId, form) {

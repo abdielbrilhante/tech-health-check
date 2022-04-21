@@ -106,5 +106,20 @@ export class SessionViewSet extends ViewSet {
   }
 
   // POST /sessions/manage/:id
-  async updateSession() {}
+  async updateSession(req) {
+    const session = await this.service.closeById(
+      req.params.id,
+      req.body,
+      req.user
+    );
+    const stats = await this.service.computeStats(session, req.user);
+    return this.html({
+      status: 200,
+      template: "session-manager",
+      context: {
+        session: session,
+        stats: stats,
+      },
+    });
+  }
 }

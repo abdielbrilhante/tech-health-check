@@ -53,6 +53,10 @@ export class SessionRepository extends Repository {
     });
   }
 
+  updateById(id, data) {
+    return this.knex("sessions").where("id", "=", id).update(data);
+  }
+
   async saveAnswers(sessionId, answers) {
     await this.knex("answers").insert({
       sessionId: sessionId,

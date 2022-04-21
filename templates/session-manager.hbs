@@ -33,7 +33,7 @@
                   <td>
                     <span
                       class="state"
-                      style="background-color: hsl(calc({{this.state}} / 1.1) 100% 36%)"
+                      style="background-color: hsl(calc({{this.state}} / 1.1) 80% 36%)"
                     >
                       {{this.stateLabel}}
                     </span>
@@ -43,7 +43,7 @@
                       <svg
                         class="w-100 white debug-grid mb4 db"
                         viewBox="0 0 100 100"
-                        fill="hsl(calc({{this.trend}} / 1.1) 100% 36%)"
+                        fill="hsl(calc({{this.trend}} / 1.1) 80% 36%)"
                       >
                         <polygon
                           points="0,{{this.trend}} 50,0 100,{{this.trend}} 50,100"
@@ -68,13 +68,19 @@
 
         <label for="notes">
           <div>Notes</div>
-          <textarea name="notes" id="notes" rows="10"></textarea>
+          <textarea name="notes" id="notes" rows="10">{{session.notes}}</textarea>
         </label>
 
         <div class="actions">
-          <button type="submit">
-            Save and close
-          </button>
+          {{#if session.open}}
+            <button type="submit">
+              Save and close
+            </button>
+          {{else}}
+            <button type="submit">
+              Save
+            </button>
+          {{/if}}
         </div>
       </form>
     </main>

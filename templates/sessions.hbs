@@ -40,16 +40,16 @@
                     name="select_{{this.id}}"
                     id="select_{{this.id}}"
                   />
-                  <td class="multi-row">
-                    <div>
-                      <a href="/sessions/manage/{{this.id}}">
-                        <b>{{this.team}}</b>
-                      </a>
-                    </div>
-                    <div>
-                      {{this.client}}
-                    </div>
-                  </td>
+                </td>
+                <td class="multi-row">
+                  <div>
+                    <a href="/sessions/manage/{{this.id}}">
+                      <b>{{this.team}}</b>
+                    </a>
+                  </div>
+                  <div>
+                    {{this.client}}
+                  </div>
                 </td>
                 <td class="multi-row">
                   <div>
@@ -63,10 +63,19 @@
                   <div>{{this.tech}}</div>
                   <div>{{this.stack}}</div>
                 </td>
-                <td>
-                  <a href="/sessions/apply/{{this.id}}">
-                    {{this.when}}
-                  </a>
+                <td class="multi-row">
+                  <div>
+                    <a href="/sessions/apply/{{this.id}}">
+                      {{this.when}}
+                    </a>
+                  </div>
+                  <div>
+                    {{#if this.open}}
+                      Open
+                    {{else}}
+                      Closed
+                    {{/if}}
+                  </div>
                 </td>
               </tr>
             {{/each}}

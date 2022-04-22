@@ -59,7 +59,7 @@ export class Server {
         req.params = match;
         req.query = new URLSearchParams(url.search);
         req.cookies = new URLSearchParams(
-          req.headers.cookie.replace(/; /g, "&")
+          req.headers.cookie?.replace(/; /g, "&")
         );
 
         req.user = await new UserService().requestUser(req.cookies.get("auth"));

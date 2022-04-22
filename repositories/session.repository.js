@@ -42,6 +42,12 @@ export class SessionRepository extends Repository {
     return this.knex("sessions").where("id", "=", id).first();
   }
 
+  getByInIds(ids, user) {
+    return this.knex("sessions")
+      .whereIn("id", ids)
+      .andWhere("ownerId", "=", user.id);
+  }
+
   create(data) {
     const { template, ...payload } = data;
     const { stack, tech, topics } = templates[template];

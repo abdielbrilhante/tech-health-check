@@ -1,0 +1,36 @@
+tr:not([data-hasanswers]) td {
+  background-color: var(--color-gray-light);
+  color: var(--color-text-dim);
+}
+
+table th:not(:first-of-type) {
+  text-align: center;
+}
+
+table th > div:not(:first-of-type) {
+  font-weight: normal;
+  margin-top: 0.125rem;
+}
+
+table td {
+  vertical-align: middle;
+}
+
+table td:not(:first-of-type) {
+  text-align: center;
+}
+
+table th:not(:first-of-type),
+table td:nth-child(2n) {
+  border-left: 1px solid var(--color-border);
+}
+
+table td:nth-child(2n) {
+  padding-right: 0;
+}
+
+table td span.state,
+table td span.trend {
+  height: 1.75rem;
+  width: 1.75rem;
+}

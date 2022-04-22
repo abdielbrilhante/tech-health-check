@@ -20,7 +20,8 @@ export class SessionViewSet extends ViewSet {
         "GET /sessions/new": this.sessionForm,
         "POST /sessions/new": this.saveSession,
         "GET /sessions/manage/:id": this.sessionOverview,
-        "POST /sessions/manage/:id": this.updateSession,
+        "PUT /sessions/manage/:id": this.updateSession,
+        "POST /sessions/compare": this.compareSessions,
       },
     };
   }
@@ -94,7 +95,7 @@ export class SessionViewSet extends ViewSet {
   // GET /sessions/manage/:id
   async sessionOverview(req) {
     const session = await this.service.getById(req.params.id, req.user);
-    const stats = await this.service.computeStats(session, req.user);
+    const stats = await this.service.computeStats(session);
     return this.html({
       status: 200,
       template: "session-manager",
@@ -105,19 +106,50 @@ export class SessionViewSet extends ViewSet {
     });
   }
 
-  // POST /sessions/manage/:id
+  // PUT /sessions/manage/:id
   async updateSession(req) {
     const session = await this.service.closeById(
       req.params.id,
       req.body,
       req.user
     );
-    const stats = await this.service.computeStats(session, req.user);
+    const stats = await this.service.computeStats(session);
     return this.html({
       status: 200,
       template: "session-manager",
       context: {
         session: session,
+        stats: stats,
+      },
+    });
+  }
+
+  // POST /sessions/compare
+  async compareSessions(req) {
+    const ids = [];
+    for (const [, value] of req.body) {
+      ids.push(value);
+    }
+
+    const sessions = await this.service.getManyById(ids, req.user);
+
+    // TODO: optimize this to have a single SQL query
+    await Promise.all(
+      sessions.map(async (session) => {
+        session.stats = await this.service.computeStats(session);
+      })
+    );
+
+    const stats = sessions[0].stats.map(({ topic }, index) => ({
+      topic,
+      perSession: sessions.map((session) => session.stats[index]),
+    }));
+
+    return this.html({
+      status: 200,
+      template: "session-compare",
+      context: {
+        sessions: sessions,
         stats: stats,
       },
     });

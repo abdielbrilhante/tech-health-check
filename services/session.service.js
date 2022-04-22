@@ -32,6 +32,14 @@ export class SessionService {
     return session;
   }
 
+  async getManyById(ids, user) {
+    const sessions = await this.repository.getByInIds(ids, user);
+    return sessions.map((session) => ({
+      ...session,
+      when: session.when.toLocaleDateString(),
+    }));
+  }
+
   async save(form, user) {
     const errors = validate.required(form, [
       "template",

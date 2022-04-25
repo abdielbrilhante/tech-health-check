@@ -1,6 +1,6 @@
-import { SessionRepository } from "../repositories/session.repository.js";
-import { RequestError } from "../shared/error.js";
-import * as validate from "../shared/validate.js";
+import { SessionRepository } from '../repositories/session.repository.js';
+import { RequestError } from '../shared/error.js';
+import * as validate from '../shared/validate.js';
 
 export class SessionService {
   constructor() {
@@ -10,7 +10,7 @@ export class SessionService {
   async filterSessions(filters, user) {
     const sessions = await this.repository.getFiltered(
       filters ?? new Map(),
-      user
+      user,
     );
     return sessions.map((session) => ({
       ...session,
@@ -42,12 +42,12 @@ export class SessionService {
 
   async save(form, user) {
     const errors = validate.required(form, [
-      "template",
-      "team",
-      "client",
-      "leadName",
-      "leadEmail",
-      "when",
+      'template',
+      'team',
+      'client',
+      'leadName',
+      'leadEmail',
+      'when',
     ]);
 
     if (errors.length > 0) {
@@ -84,7 +84,7 @@ export class SessionService {
       }));
 
     for (const [key, value] of form) {
-      const [group, index] = key.split("_");
+      const [group, index] = key.split('_');
       answers[index][group] = value;
     }
 
@@ -115,14 +115,14 @@ export class SessionService {
 
     for (const stat of stats) {
       stat.state = Math.round(
-        stat.stateCount ? stat.state / stat.stateCount : 0
+        stat.stateCount ? stat.state / stat.stateCount : 0,
       );
       stat.trend = Math.round(
-        stat.trendCount ? stat.trend / stat.trendCount : 0
+        stat.trendCount ? stat.trend / stat.trendCount : 0,
       );
 
-      stat.stateLabel = stat.state === 100 ? "M" : stat.state;
-      stat.trendLabel = stat.trend === 100 ? "M" : stat.trend;
+      stat.stateLabel = stat.state === 100 ? 'M' : stat.state;
+      stat.trendLabel = stat.trend === 100 ? 'M' : stat.trend;
       stat.hasAnswers = stat.stateCount > 0 || stat.trendCount > 0;
     }
 

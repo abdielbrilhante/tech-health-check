@@ -1,4 +1,4 @@
-import { statusMessages } from "./status.js";
+import { statusMessages } from './status.js';
 
 export class RequestError extends Error {
   constructor(status, data) {

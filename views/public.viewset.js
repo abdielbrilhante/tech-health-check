@@ -1,10 +1,10 @@
-import { ViewSet } from "../shared/viewset.js";
+import { ViewSet } from '../shared/viewset.js';
 
 export class PublicViewSet extends ViewSet {
   get routes() {
     return {
       public: {
-        "GET /": this.homepage,
+        'GET /': this.homepage,
       },
     };
   }
@@ -12,7 +12,7 @@ export class PublicViewSet extends ViewSet {
   homepage() {
     return this.html({
       status: 200,
-      template: "homepage",
+      template: 'homepage',
     });
   }
 }

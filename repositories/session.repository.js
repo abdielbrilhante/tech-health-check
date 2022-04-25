@@ -1,57 +1,57 @@
-import { Repository } from "../shared/repository.js";
+import { Repository } from '../shared/repository.js';
 
-import { react } from "../data/react.js";
+import { react } from '../data/react.js';
 
 const templates = { react };
 
 export class SessionRepository extends Repository {
   getFiltered(filters) {
-    const query = this.knex("sessions").whereNull("archived");
+    const query = this.knex('sessions').whereNull('archived');
 
-    if (filters.get("stack")) {
-      query.andWhere("stack", "=", filters.get("stack"));
+    if (filters.get('stack')) {
+      query.andWhere('stack', '=', filters.get('stack'));
     }
 
-    if (filters.get("dateFrom")) {
-      query.andWhere("when", ">=", filters.get("dateFrom"));
+    if (filters.get('dateFrom')) {
+      query.andWhere('when', '>=', filters.get('dateFrom'));
     }
 
-    if (filters.get("dateTo")) {
-      query.andWhere("when", "<=", filters.get("dateTo"));
+    if (filters.get('dateTo')) {
+      query.andWhere('when', '<=', filters.get('dateTo'));
     }
 
     const applyTextSearch = (field) => {
       if (filters.get(field)) {
         query.whereRaw(
           `lower(${field}) like ?`,
-          `%${filters.get(field).toLowerCase()}%`
+          `%${filters.get(field).toLowerCase()}%`,
         );
       }
     };
 
-    applyTextSearch("tech");
-    applyTextSearch("team");
-    applyTextSearch("client");
-    applyTextSearch("leadName");
-    applyTextSearch("leadEmail");
+    applyTextSearch('tech');
+    applyTextSearch('team');
+    applyTextSearch('client');
+    applyTextSearch('leadName');
+    applyTextSearch('leadEmail');
 
-    return query.orderBy("created", "desc");
+    return query.orderBy('created', 'desc');
   }
 
   getById(id) {
-    return this.knex("sessions").where("id", "=", id).first();
+    return this.knex('sessions').where('id', '=', id).first();
   }
 
   getByInIds(ids, user) {
-    return this.knex("sessions")
-      .whereIn("id", ids)
-      .andWhere("ownerId", "=", user.id);
+    return this.knex('sessions')
+      .whereIn('id', ids)
+      .andWhere('ownerId', '=', user.id);
   }
 
   create(data) {
     const { template, ...payload } = data;
     const { stack, tech, topics } = templates[template];
-    return this.knex("sessions").insert({
+    return this.knex('sessions').insert({
       ...payload,
       stack,
       tech,
@@ -60,17 +60,17 @@ export class SessionRepository extends Repository {
   }
 
   updateById(id, data) {
-    return this.knex("sessions").where("id", "=", id).update(data);
+    return this.knex('sessions').where('id', '=', id).update(data);
   }
 
   async saveAnswers(sessionId, answers) {
-    await this.knex("answers").insert({
+    await this.knex('answers').insert({
       sessionId: sessionId,
       answers: JSON.stringify(answers),
     });
   }
 
   sessionAnswers(session) {
-    return this.knex("answers").where("sessionId", "=", session.id);
+    return this.knex('answers').where('sessionId', '=', session.id);
   }
 }

@@ -1,5 +1,5 @@
-import { ViewSet } from "../shared/viewset.js";
-import { SessionService } from "../services/session.service.js";
+import { ViewSet } from '../shared/viewset.js';
+import { SessionService } from '../services/session.service.js';
 
 export class SessionViewSet extends ViewSet {
   constructor() {
@@ -10,18 +10,18 @@ export class SessionViewSet extends ViewSet {
   get routes() {
     return {
       public: {
-        "GET /sessions/apply/:id": this.applyHealthCheck,
-        "POST /sessions/apply/:id": this.saveAnswers,
-        "GET /sessions/success": this.sessionSuccess,
+        'GET /sessions/apply/:id': this.applyHealthCheck,
+        'POST /sessions/apply/:id': this.saveAnswers,
+        'GET /sessions/success': this.sessionSuccess,
       },
       protected: {
-        "GET /sessions": this.sessionList,
-        "POST /sessions": this.sessionList,
-        "GET /sessions/new": this.sessionForm,
-        "POST /sessions/new": this.saveSession,
-        "GET /sessions/manage/:id": this.sessionOverview,
-        "PUT /sessions/manage/:id": this.updateSession,
-        "POST /sessions/compare": this.compareSessions,
+        'GET /sessions': this.sessionList,
+        'POST /sessions': this.sessionList,
+        'GET /sessions/new': this.sessionForm,
+        'POST /sessions/new': this.saveSession,
+        'GET /sessions/manage/:id': this.sessionOverview,
+        'PUT /sessions/manage/:id': this.updateSession,
+        'POST /sessions/compare': this.compareSessions,
       },
     };
   }
@@ -31,7 +31,7 @@ export class SessionViewSet extends ViewSet {
     const sessions = await this.service.filterSessions(req.body, req.user);
     return this.html({
       status: 200,
-      template: "sessions",
+      template: 'sessions',
       context: {
         sessions,
         values: Object.fromEntries(req.body),
@@ -40,10 +40,10 @@ export class SessionViewSet extends ViewSet {
   }
 
   // GET /sessions/new
-  async sessionForm(req) {
+  sessionForm(req) {
     return this.html({
       status: 200,
-      template: "session-form",
+      template: 'session-form',
       context: {
         values: Object.fromEntries(req.body),
         errors: req.errors,
@@ -55,7 +55,7 @@ export class SessionViewSet extends ViewSet {
   async saveSession(req) {
     try {
       await this.service.save(req.body, req.user);
-      return this.redirect({ to: "/sessions" });
+      return this.redirect({ to: '/sessions' });
     } catch (error) {
       if (error.status === 400 && error.data) {
         req.errors = error.data;
@@ -71,7 +71,7 @@ export class SessionViewSet extends ViewSet {
     const session = await this.service.getById(req.params.id);
     return this.html({
       status: 200,
-      template: "session-apply",
+      template: 'session-apply',
       context: {
         session: session,
       },
@@ -81,14 +81,14 @@ export class SessionViewSet extends ViewSet {
   // POST /sessions/apply/:id
   async saveAnswers(req) {
     await this.service.saveAnswers(req.params.id, req.body);
-    return this.redirect({ to: "/sessions/success" });
+    return this.redirect({ to: '/sessions/success' });
   }
 
   // GET /sessions/success
-  async sessionSuccess() {
+  sessionSuccess() {
     return this.html({
       status: 200,
-      template: "session-success",
+      template: 'session-success',
     });
   }
 
@@ -98,7 +98,7 @@ export class SessionViewSet extends ViewSet {
     const stats = await this.service.computeStats(session);
     return this.html({
       status: 200,
-      template: "session-manager",
+      template: 'session-manager',
       context: {
         session: session,
         stats: stats,
@@ -111,12 +111,12 @@ export class SessionViewSet extends ViewSet {
     const session = await this.service.closeById(
       req.params.id,
       req.body,
-      req.user
+      req.user,
     );
     const stats = await this.service.computeStats(session);
     return this.html({
       status: 200,
-      template: "session-manager",
+      template: 'session-manager',
       context: {
         session: session,
         stats: stats,
@@ -137,7 +137,7 @@ export class SessionViewSet extends ViewSet {
     await Promise.all(
       sessions.map(async (session) => {
         session.stats = await this.service.computeStats(session);
-      })
+      }),
     );
 
     const stats = sessions[0].stats.map(({ topic }, index) => ({
@@ -147,7 +147,7 @@ export class SessionViewSet extends ViewSet {
 
     return this.html({
       status: 200,
-      template: "session-compare",
+      template: 'session-compare',
       context: {
         sessions: sessions,
         stats: stats,

@@ -1,7 +1,7 @@
-import { Repository } from "../shared/repository.js";
+import { Repository } from '../shared/repository.js';
 
 export class UserRepository extends Repository {
   getByEmail(email) {
-    return this.knex("users").where({ email }).first();
+    return this.knex('users').where({ email }).first();
   }
 }

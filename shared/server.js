@@ -1,21 +1,21 @@
-import { createServer } from "http";
-import { createReadStream } from "fs";
-import { stat } from "fs/promises";
-import { resolve } from "path";
+import { createServer } from 'http';
+import { createReadStream } from 'fs';
+import { stat } from 'fs/promises';
+import { resolve } from 'path';
 
-import { RequestError } from "./error.js";
-import { mimeTypes } from "./mime.js";
-import { __dirname } from "./path.js";
-import { ViewSet } from "./viewset.js";
-import { UserService } from "../services/user.service.js";
+import { RequestError } from './error.js';
+import { mimeTypes } from './mime.js';
+import { __dirname } from './path.js';
+import { ViewSet } from './viewset.js';
+import { UserService } from '../services/user.service.js';
 
-const { NODE_ENV = "development", PORT = 4040 } = process.env;
+const { NODE_ENV = 'development', PORT = 4040 } = process.env;
 
 export class Server {
   constructor() {
     this.server = createServer((req, res) => this.handleRequest(req, res));
     this.views = {
-      "GET /*": this.serveStatics.bind(this),
+      'GET /*': this.serveStatics.bind(this),
     };
   }
 
@@ -26,7 +26,7 @@ export class Server {
     try {
       const handler = await this.matchHandler(req);
       if (handler?.protected && !req.user) {
-        this.sendResponse(res, { status: 301, Location: "/" });
+        this.sendResponse(res, { status: 301, Location: '/' });
       } else if (handler) {
         this.sendResponse(res, await handler(req, res));
       } else {
@@ -44,7 +44,7 @@ export class Server {
 
     const end = +new Date();
     console.info(
-      `[${end}] < ${req.method} ${req.url} (${res.statusCode}) (${end - now}ms)`
+      `[${end}] < ${req.method} ${req.url} (${res.statusCode}) (${end - now}ms)`,
     );
   }
 
@@ -59,10 +59,10 @@ export class Server {
         req.params = match;
         req.query = new URLSearchParams(url.search);
         req.cookies = new URLSearchParams(
-          req.headers.cookie?.replace(/; /g, "&")
+          req.headers.cookie?.replace(/; /gu, '&'),
         );
 
-        req.user = await new UserService().requestUser(req.cookies.get("auth"));
+        req.user = await new UserService().requestUser(req.cookies.get('auth'));
         return handler;
       }
     }
@@ -75,17 +75,17 @@ export class Server {
       return {};
     }
 
-    const pathSegments = path.split("/").filter(Boolean);
-    const inputSegments = input.split("/").filter(Boolean);
+    const pathSegments = path.split('/').filter(Boolean);
+    const inputSegments = input.split('/').filter(Boolean);
 
-    if (pathSegments.length !== inputSegments.length && !input.includes("*")) {
+    if (pathSegments.length !== inputSegments.length && !input.includes('*')) {
       return null;
     }
 
     const params = {};
 
     for (const [index, segment] of pathSegments.entries()) {
-      if (segment.startsWith(":")) {
+      if (segment.startsWith(':')) {
         params[segment.substring(1)] = inputSegments[index];
       } else if (segment !== inputSegments[index]) {
         return null;
@@ -95,9 +95,9 @@ export class Server {
     return params;
   }
 
-  async extractRequestBody(req) {
+  extractRequestBody(req) {
     // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolvePromise) => {
       try {
         const buffers = [];
 
@@ -106,9 +106,9 @@ export class Server {
         }
 
         const data = Buffer.concat(buffers).toString();
-        resolve(new URLSearchParams(data));
+        resolvePromise(new URLSearchParams(data));
       } catch (error) {
-        resolve(new URLSearchParams());
+        resolvePromise(new URLSearchParams());
       }
     });
   }
@@ -116,7 +116,7 @@ export class Server {
   sendResponse(res, response) {
     if (!res.headersSent) {
       const { status, body, ...head } = response;
-      res.writeHead(status, { "Content-Type": "text/html", ...head });
+      res.writeHead(status, { 'Content-Type': 'text/html', ...head });
       res.end(body);
     }
   }
@@ -126,7 +126,7 @@ export class Server {
     const viewset = new ViewSet();
     const response = await viewset.html({
       status: status,
-      template: "error",
+      template: 'error',
       context: {
         status,
         message,
@@ -138,18 +138,18 @@ export class Server {
 
   async serveStatics(req, res) {
     try {
-      if (!req.url.includes(".")) {
+      if (!req.url.includes('.')) {
         throw new RequestError(404);
       }
 
       const path = resolve(
         __dirname,
-        `../public/${req.url.replace(/^\/public/u, "")}`
+        `../public/${req.url.replace(/^\/public/u, '')}`,
       );
-      const [ext] = req.url.split(".").slice(-1);
+      const [ext] = req.url.split('.').slice(-1);
       res.writeHead(200, {
-        "Content-Type": mimeTypes[ext] ?? mimeTypes.txt,
-        "Content-Length": (await stat(path)).size,
+        'Content-Type': mimeTypes[ext] ?? mimeTypes.txt,
+        'Content-Length': (await stat(path)).size,
       });
 
       const readStream = createReadStream(path);
@@ -159,7 +159,7 @@ export class Server {
       if (error instanceof RequestError) {
         this.sendError(res, error);
       } else {
-        res.writeHead(500, { "Content-Type": mimeTypes.txt });
+        res.writeHead(500, { 'Content-Type': mimeTypes.txt });
         res.end();
       }
     }
@@ -168,19 +168,19 @@ export class Server {
   viewset(viewset) {
     for (const [level, routes] of Object.entries(viewset.routes)) {
       for (const [endpoint, handler] of Object.entries(routes)) {
-        const [method, path] = endpoint.split(" ");
+        const [method, path] = endpoint.split(' ');
         this.views[method] = this.views[method] ?? {};
         this.views[method][path] = handler.bind(viewset);
-        this.views[method][path].protected = level === "protected";
+        this.views[method][path].protected = level === 'protected';
       }
     }
   }
 
   listen() {
     this.server.listen(PORT, () => {
-      if (NODE_ENV === "development") {
+      if (NODE_ENV === 'development') {
         console.info(
-          `[${+new Date()}] Server listening on http://localhost:${PORT}`
+          `[${+new Date()}] Server listening on http://localhost:${PORT}`,
         );
       }
     });

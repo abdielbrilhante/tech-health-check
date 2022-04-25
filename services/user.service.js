@@ -49,8 +49,4 @@ export class UserService {
 
     return branca.encode(user.email);
   }
-
-  async checkToken() {
-    //
-  }
 }

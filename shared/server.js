@@ -25,9 +25,7 @@ export class Server {
 
     try {
       const handler = await this.matchHandler(req);
-      if (handler?.protected && !req.user) {
-        this.sendResponse(res, { status: 301, Location: '/' });
-      } else if (handler) {
+      if (handler) {
         this.sendResponse(res, await handler(req, res));
       } else {
         await this.serveStatics(req, res);
@@ -166,13 +164,10 @@ export class Server {
   }
 
   viewset(viewset) {
-    for (const [level, routes] of Object.entries(viewset.routes)) {
-      for (const [endpoint, handler] of Object.entries(routes)) {
-        const [method, path] = endpoint.split(' ');
-        this.views[method] = this.views[method] ?? {};
-        this.views[method][path] = handler.bind(viewset);
-        this.views[method][path].protected = level === 'protected';
-      }
+    for (const [endpoint, handler] of Object.entries(viewset.routes)) {
+      const [method, path] = endpoint.split(' ');
+      this.views[method] = this.views[method] ?? {};
+      this.views[method][path] = handler.bind(viewset);
     }
   }
 

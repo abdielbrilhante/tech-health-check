@@ -3,14 +3,14 @@ import { resolve } from 'path';
 import Handlebars from 'handlebars';
 
 import { __dirname } from './path.js';
-import { RequestError } from './error.js';
 
 // Cache
 const templates = {};
 
 export class ViewSet {
-  get routes() {
-    return {};
+  constructor(req, res) {
+    this.req = req;
+    this.res = res;
   }
 
   async html({ status = 200, template, context }) {
@@ -33,11 +33,5 @@ export class ViewSet {
     }
 
     return templates[template];
-  }
-
-  requireUser(req) {
-    if (!req.user) {
-      throw new RequestError(401);
-    }
   }
 }

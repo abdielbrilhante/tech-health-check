@@ -1,17 +1,12 @@
 import { SessionRepository } from '../repositories/session.repository.js';
 import { RequestError } from '../shared/error.js';
-import * as validate from '../shared/validate.js';
 
 export class SessionService {
-  constructor() {
-    this.repository = new SessionRepository();
-  }
+  repository = new SessionRepository();
 
   async filterSessions(filters, user) {
-    const sessions = await this.repository.getFiltered(
-      filters ?? new Map(),
-      user,
-    );
+    const sessions = await this.repository.getFiltered(filters ?? new Map(), user);
+
     return sessions.map((session) => ({
       ...session,
       when: session.when.toLocaleString(),
@@ -20,11 +15,7 @@ export class SessionService {
 
   async getById(id, user) {
     const session = await this.repository.getById(id);
-    if (
-      !session ||
-      (user && session.ownerId !== user.id) ||
-      (!user && !session.open)
-    ) {
+    if (!session || (user && session.ownerId !== user.id) || (!user && !session.open)) {
       throw new RequestError(404);
     }
 
@@ -40,24 +31,8 @@ export class SessionService {
     }));
   }
 
-  async save(form, user) {
-    const errors = validate.required(form, [
-      'template',
-      'team',
-      'client',
-      'leadName',
-      'leadEmail',
-      'when',
-    ]);
-
-    if (errors.length > 0) {
-      throw new RequestError(400, Object.fromEntries(errors));
-    }
-
-    await this.repository.create({
-      ...Object.fromEntries(form),
-      ownerId: user.id,
-    });
+  save(form, user) {
+    return this.repository.create({ ...form, ownerId: user.id });
   }
 
   async closeById(id, form, user) {
@@ -66,7 +41,7 @@ export class SessionService {
       throw new RequestError(404);
     }
 
-    const data = { ...Object.fromEntries(form), open: false };
+    const data = { ...form, open: false };
     await this.repository.updateById(id, data);
 
     Object.assign(session, data);
@@ -83,7 +58,7 @@ export class SessionService {
         trend: null,
       }));
 
-    for (const [key, value] of form) {
+    for (const [key, value] of Object.entries(form)) {
       const [group, index] = key.split('_');
       answers[index][group] = value;
     }

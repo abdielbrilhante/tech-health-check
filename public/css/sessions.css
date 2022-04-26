@@ -1,3 +1,7 @@
+header, main {
+  max-width: 1200px;
+}
+
 main {
   align-items: flex-start;
   display: flex;
@@ -29,6 +33,13 @@ table input[type="checkbox"] {
   cursor: pointer;
   height: 1rem;
   width: 1rem;
+}
+
+td:nth-child(3) div:last-child {
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 td:nth-child(4) div:last-child {

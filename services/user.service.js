@@ -23,26 +23,12 @@ export class UserService {
   }
 
   async authenticate(form) {
-    const errors = [];
-
-    if (!form.has('email')) {
-      errors.push(['email', 'Email is required']);
-    }
-
-    if (!form.has('password')) {
-      errors.push(['password', 'Password is required']);
-    }
-
-    if (errors.length > 0) {
-      throw new RequestError(422, Object.fromEntries(errors));
-    }
-
-    const user = await this.repository.getByEmail(form.get('email'));
+    const user = await this.repository.getByEmail(form.email);
     if (!user) {
       throw new RequestError(401);
     }
 
-    const matches = await bcrypt.compare(form.get('password'), user.password);
+    const matches = await bcrypt.compare(form.password, user.password);
     if (!matches) {
       throw new RequestError(401);
     }

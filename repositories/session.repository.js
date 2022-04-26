@@ -6,25 +6,25 @@ const templates = { react };
 
 export class SessionRepository extends Repository {
   getFiltered(filters) {
-    const query = this.knex('sessions').whereNull('archived');
+    const query = this.knex('sessions');
 
-    if (filters.get('stack')) {
-      query.andWhere('stack', '=', filters.get('stack'));
+    if (filters.stack) {
+      query.andWhere('stack', '=', filters.stack);
     }
 
-    if (filters.get('dateFrom')) {
-      query.andWhere('when', '>=', filters.get('dateFrom'));
+    if (filters.dateFrom) {
+      query.andWhere('when', '>=', filters.dateFrom);
     }
 
-    if (filters.get('dateTo')) {
-      query.andWhere('when', '<=', filters.get('dateTo'));
+    if (filters.dateTo) {
+      query.andWhere('when', '<=', filters.dateTo);
     }
 
     const applyTextSearch = (field) => {
-      if (filters.get(field)) {
+      if (filters[field]) {
         query.whereRaw(
           `lower(${field}) like ?`,
-          `%${filters.get(field).toLowerCase()}%`,
+          `%${filters[field].toLowerCase()}%`,
         );
       }
     };

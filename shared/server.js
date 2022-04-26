@@ -2,6 +2,8 @@ import { createServer } from 'http';
 import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
 import { resolve } from 'path';
+import UrlPattern from 'url-pattern';
+import * as yup from 'yup';
 
 import { RequestError } from './error.js';
 import { mimeTypes } from './mime.js';
@@ -12,11 +14,16 @@ import { UserService } from '../services/user.service.js';
 const { NODE_ENV = 'development', PORT = 4040 } = process.env;
 
 export class Server {
-  constructor() {
+  constructor(schema) {
     this.server = createServer((req, res) => this.handleRequest(req, res));
-    this.views = {
-      'GET /*': this.serveStatics.bind(this),
-    };
+    this.schema = Object.entries(schema).map(([endpoint, config]) => {
+      const [method, path] = endpoint.split(' ');
+      return {
+        ...config,
+        method,
+        pattern: new UrlPattern(path),
+      };
+    });
   }
 
   async handleRequest(req, res) {
@@ -24,9 +31,9 @@ export class Server {
     console.info(`[${now}] > ${req.method} ${req.url}`);
 
     try {
-      const handler = await this.matchHandler(req);
+      const handler = await this.matchHandler(req, res);
       if (handler) {
-        this.sendResponse(res, await handler(req, res));
+        this.sendResponse(res, await handler());
       } else {
         await this.serveStatics(req, res);
       }
@@ -46,51 +53,52 @@ export class Server {
     );
   }
 
-  async matchHandler(req) {
+  async matchHandler(req, res) {
     const url = new URL(`https://${req.headers.host}${req.url}`);
-    const handlers = this.views[req.method] ?? [];
 
-    for (const [path, handler] of Object.entries(handlers)) {
-      const match = this.matchPath(path, url.pathname);
-      if (match) {
-        req.body = await this.extractRequestBody(req);
-        req.params = match;
-        req.query = new URLSearchParams(url.search);
-        req.cookies = new URLSearchParams(
-          req.headers.cookie?.replace(/; /gu, '&'),
-        );
+    const [view, match] = this.matchPath(req.method, url.pathname);
+    if (view) {
+      req.cookies = Object.fromEntries(
+        new URLSearchParams(req.headers.cookie?.replace(/; /gu, '&')),
+      );
 
-        req.user = await new UserService().requestUser(req.cookies.get('auth'));
-        return handler;
-      }
+      req.user = await new UserService().requestUser(req.cookies.auth);
+
+      const viewset = new view.viewset(req, res);
+      return async () => {
+        if (view.requireUser && !req.user) {
+          throw new RequestError(401);
+        }
+
+        const { schema = {} } = view;
+
+        try {
+          req.body = await this.validate(schema.body, await this.extractRequestBody(req));
+          req.params = await this.validate(schema.params, match);
+          req.query = await this.validate(schema.query, new URLSearchParams(url.search));
+        } catch (error) {
+          console.error(error);
+          throw new RequestError(400, error.errors);
+        }
+
+        return viewset[view.handler]();
+      };
     }
 
     return null;
   }
 
-  matchPath(path, input) {
-    if (path === input) {
-      return {};
-    }
-
-    const pathSegments = path.split('/').filter(Boolean);
-    const inputSegments = input.split('/').filter(Boolean);
-
-    if (pathSegments.length !== inputSegments.length && !input.includes('*')) {
-      return null;
-    }
-
-    const params = {};
-
-    for (const [index, segment] of pathSegments.entries()) {
-      if (segment.startsWith(':')) {
-        params[segment.substring(1)] = inputSegments[index];
-      } else if (segment !== inputSegments[index]) {
-        return null;
+  matchPath(method, path) {
+    for (const view of this.schema) {
+      if (view.method === method) {
+        const match = view.pattern.match(path);
+        if (match) {
+          return [view, match];
+        }
       }
     }
 
-    return params;
+    return [];
   }
 
   extractRequestBody(req) {
@@ -104,11 +112,33 @@ export class Server {
         }
 
         const data = Buffer.concat(buffers).toString();
-        resolvePromise(new URLSearchParams(data));
+        const params = new URLSearchParams(data);
+        const result = {};
+        for (const [key, value] of params) {
+          if (!(key in result)) {
+            result[key] = value;
+          } else if (Array.isArray(result[key])) {
+            result[key].push(value);
+          } else {
+            result[key] = [result[key], value];
+          }
+        }
+
+        resolvePromise(result);
       } catch (error) {
-        resolvePromise(new URLSearchParams());
+        resolvePromise({});
       }
     });
+  }
+
+  validate(schema, data) {
+    if (schema) {
+      const yupSchema = yup.object().shape(schema);
+      const values = yupSchema.cast(data);
+      return yupSchema.validate(values, { abortEarly: false, strict: true });
+    }
+
+    return data;
   }
 
   sendResponse(res, response) {
@@ -160,14 +190,6 @@ export class Server {
         res.writeHead(500, { 'Content-Type': mimeTypes.txt });
         res.end();
       }
-    }
-  }
-
-  viewset(viewset) {
-    for (const [endpoint, handler] of Object.entries(viewset.routes)) {
-      const [method, path] = endpoint.split(' ');
-      this.views[method] = this.views[method] ?? {};
-      this.views[method][path] = handler.bind(viewset);
     }
   }
 

@@ -11,10 +11,10 @@ export class UserViewSet extends ViewSet {
     return this.html({ template: 'login' });
   }
 
-  async authenticate(req, res) {
+  async authenticate() {
     const service = new UserService();
-    const token = await service.authenticate(req.body);
-    res.setHeader('Set-Cookie', [`auth=${token}`]);
+    const token = await service.authenticate(this.req.body);
+    this.res.setHeader('Set-Cookie', [`auth=${token}`]);
     return this.redirect({ to: '/sessions' });
   }
 }

@@ -1,92 +1,83 @@
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tech Health Check</title>
 
-    <link rel="stylesheet" href="/css/main.css" />
-    <link rel="stylesheet" href="/css/form.css" />
-    <link rel="stylesheet" href="/css/button.css" />
-    <link rel="stylesheet" href="/css/table.css" />
-    <link rel="stylesheet" href="/css/session-stats.css" />
-    <link rel="stylesheet" href="/css/session-manager.css" />
-  </head>
-  <body>
-    <header>
-      <h1>{{session.tech}} health check - {{session.team}} - {{session.when}} </h1>
-      <a href="/sessions">All sessions</a>
-    </header>
-    <main>
-      <form action="/sessions/manage/{{session.id}}" method="post">
-        <table cellspacing="0">
-          <thead>
-            <tr>
-              <th>Topic</th>
-              <th>State</th>
-              <th>Trend</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each stats}}
-              <tr {{#if hasAnswers}}data-hasanswers{{/if}}>
-                <td style="width: 100%">{{this.topic}}</td>
-                {{#if hasAnswers}}
-                  <td>
-                    <span
-                      class="state"
-                      style="background-color: hsl(calc({{this.state}} / 1.1) 90% 45%)"
-                    >
-                      {{this.stateLabel}}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="trend">
-                      <svg
-                        class="w-100 white debug-grid mb4 db"
-                        viewBox="0 0 100 100"
-                        fill="hsl(calc({{this.trend}} / 1.1) 90% 45%)"
-                        stroke="#444"
-                        stroke-width="calc(100/36)"
-                      >
-                        <polygon
-                          points="0,{{this.trend}} 50,0 100,{{this.trend}} 50,100"
-                        >
-                        </polygon>
-                      </svg>
-                      <span
-                        style="transform: translate(-50%, calc({{this.trend}}% - 100%));"
-                      >
-                        {{this.trendLabel}}
-                      </span>
-                    </span>
-                  </td>
-                {{else}}
-                  <td>N/A</td>
-                  <td>N/A</td>
-                {{/if}}
-              </tr>
-            {{/each}}
-          </tbody>
-        </table>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech Health Check</title>
 
-        <label for="notes">
-          <div>Notes</div>
-          <textarea name="notes" id="notes" rows="10">{{session.notes}}</textarea>
-        </label>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/form.css" />
+  <link rel="stylesheet" href="/css/button.css" />
+  <link rel="stylesheet" href="/css/table.css" />
+  <link rel="stylesheet" href="/css/session-stats.css" />
+  <link rel="stylesheet" href="/css/session-manager.css" />
+</head>
 
-        <div class="actions">
-          {{#if session.open}}
-            <button type="submit">
-              Save and close
-            </button>
-          {{else}}
-            <button type="submit">
-              Save
-            </button>
-          {{/if}}
-        </div>
-      </form>
-    </main>
-  </body>
+<body>
+  <header>
+    <h1>{{session.tech}} health check - {{session.team}} - {{session.when}}</h1>
+    <a href="/sessions">All sessions</a>
+  </header>
+  <main>
+    <form action="/sessions/manage/{{session.id}}" method="post">
+      <table cellspacing="0">
+        <thead>
+          <tr>
+            <th>Topic</th>
+            <th>State</th>
+            <th>Trend</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each stats}}
+          <tr {{#if hasAnswers}}data-hasanswers{{/if}}>
+            <td style="width: 100%">{{this.topic}}</td>
+            {{#if hasAnswers}}
+            <td>
+              <span class="state" style="background-color: hsl(calc({{this.state}} / 1.1) 90% 45%)">
+                {{this.stateLabel}}
+              </span>
+            </td>
+            <td>
+              <span class="trend">
+                <svg class="w-100 white debug-grid mb4 db" viewBox="0 0 100 100"
+                  fill="hsl(calc({{this.trend}} / 1.1) 90% 45%)" stroke="#444" stroke-width="calc(100/36)">
+                  <polygon points="0,{{this.trend}} 50,0 100,{{this.trend}} 50,100">
+                  </polygon>
+                </svg>
+                <span style="transform: translate(-50%, calc({{this.trend}}% - 100%));">
+                  {{this.trendLabel}}
+                </span>
+              </span>
+            </td>
+            {{else}}
+            <td>N/A</td>
+            <td>N/A</td>
+            {{/if}}
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+      <label for="notes">
+        <div>Notes</div>
+        <textarea name="notes" id="notes" rows="10">{{session.notes}}</textarea>
+      </label>
+
+      <div class="actions">
+        {{#if session.open}}
+        <button type="submit">
+          Save and close
+        </button>
+        {{else}}
+        <button type="submit">
+          Save
+        </button>
+        {{/if}}
+      </div>
+    </form>
+  </main>
+</body>
+
 </html>

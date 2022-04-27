@@ -1,6 +1,17 @@
 import { SessionRepository } from '../repositories/session.repository.js';
 import { RequestError } from '../shared/error.js';
 
+const dateTimeFormatter = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'short',
+  timeStyle: 'short',
+  timeZone: 'America/Fortaleza',
+});
+
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'short',
+  timeZone: 'America/Fortaleza',
+});
+
 export class SessionService {
   repository = new SessionRepository();
 
@@ -9,7 +20,7 @@ export class SessionService {
 
     return sessions.map((session) => ({
       ...session,
-      when: session.when.toLocaleString(),
+      when: dateTimeFormatter.format(session.when),
     }));
   }
 
@@ -19,7 +30,7 @@ export class SessionService {
       throw new RequestError(404);
     }
 
-    session.when = session.when.toLocaleString();
+    session.when = dateTimeFormatter.format(session.when);
     return session;
   }
 
@@ -27,7 +38,7 @@ export class SessionService {
     const sessions = await this.repository.getByInIds(ids, user);
     return sessions.map((session) => ({
       ...session,
-      when: session.when.toLocaleDateString(),
+      when: dateFormatter.format(session.when),
     }));
   }
 
@@ -45,7 +56,7 @@ export class SessionService {
     await this.repository.updateById(id, data);
 
     Object.assign(session, data);
-    session.when = session.when.toLocaleString();
+    session.when = dateTimeFormatter.format(session.when);
     return session;
   }
 

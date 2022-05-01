@@ -94,8 +94,8 @@ export class SessionService {
         stats[index].state += increments[answer.state] ?? 0;
         stats[index].trend += increments[answer.trend] ?? 0;
 
-        stats[index].stateCount += increments[answer.state] ? 1 : 0;
-        stats[index].trendCount += increments[answer.trend] ? 1 : 0;
+        stats[index].stateCount += increments[answer.state] != null ? 1 : 0;
+        stats[index].trendCount += increments[answer.trend] != null ? 1 : 0;
       }
     }
 

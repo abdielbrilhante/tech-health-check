@@ -2,28 +2,19 @@ import { createServer } from 'http';
 import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
 import { resolve } from 'path';
-import UrlPattern from 'url-pattern';
-import * as yup from 'yup';
+import { ValidationError } from 'yup';
 
 import { RequestError } from './error.js';
 import { mimeTypes } from './mime.js';
 import { __dirname } from './path.js';
-import { ViewSet } from './viewset.js';
-import { UserService } from '../services/user.service.js';
+import { View } from './view.js';
 
 const { NODE_ENV = 'development', PORT = 4040 } = process.env;
 
 export class Server {
-  constructor(schema) {
+  constructor() {
     this.server = createServer((req, res) => this.handleRequest(req, res));
-    this.schema = Object.entries(schema).map(([endpoint, config]) => {
-      const [method, path] = endpoint.split(' ');
-      return {
-        ...config,
-        method,
-        pattern: new UrlPattern(path),
-      };
-    });
+    this.views = [];
   }
 
   async handleRequest(req, res) {
@@ -33,7 +24,7 @@ export class Server {
     try {
       const handler = await this.matchHandler(req, res);
       if (handler) {
-        this.sendResponse(res, await handler());
+        this.sendResponse(res, await handler(req, res));
       } else {
         await this.serveStatics(req, res);
       }
@@ -42,6 +33,8 @@ export class Server {
 
       if (error instanceof RequestError) {
         this.sendError(res, error);
+      } else if (error instanceof ValidationError) {
+        this.sendError(res, new RequestError(400, error));
       } else {
         this.sendError(res, new RequestError(500));
       }
@@ -53,7 +46,7 @@ export class Server {
     );
   }
 
-  async matchHandler(req, res) {
+  async matchHandler(req) {
     const url = new URL(`https://${req.headers.host}${req.url}`);
 
     const [view, match] = this.matchPath(req.method, url.pathname);
@@ -62,36 +55,20 @@ export class Server {
         new URLSearchParams(req.headers.cookie?.replace(/; /gu, '&')),
       );
 
-      req.user = await new UserService().requestUser(req.cookies.auth);
+      req.params = match;
+      req.query = new URLSearchParams(url.search);
+      req.body = await this.extractRequestBody(req);
 
-      const viewset = new view.viewset(req, res);
-      return async () => {
-        if (view.requireUser && !req.user) {
-          throw new RequestError(401);
-        }
-
-        const { schema = {} } = view;
-
-        try {
-          req.body = await this.validate(schema.body, await this.extractRequestBody(req));
-          req.params = await this.validate(schema.params, match);
-          req.query = await this.validate(schema.query, new URLSearchParams(url.search));
-        } catch (error) {
-          console.error(error);
-          throw new RequestError(400, error.errors);
-        }
-
-        return viewset[view.handler]();
-      };
+      return view.handleRequest.bind(view);
     }
 
     return null;
   }
 
   matchPath(method, path) {
-    for (const view of this.schema) {
-      if (view.method === method) {
-        const match = view.pattern.match(path);
+    for (const [route, view] of this.views) {
+      if (route.method === method) {
+        const match = route.pattern.match(path);
         if (match) {
           return [view, match];
         }
@@ -131,16 +108,6 @@ export class Server {
     });
   }
 
-  validate(schema, data) {
-    if (schema) {
-      const yupSchema = yup.object().shape(schema);
-      const values = yupSchema.cast(data);
-      return yupSchema.validate(values, { abortEarly: false, strict: true });
-    }
-
-    return data;
-  }
-
   sendResponse(res, response) {
     if (!res.headersSent) {
       const { status, body, ...head } = response;
@@ -151,8 +118,7 @@ export class Server {
 
   async sendError(res, error) {
     const { status, message } = error;
-    const viewset = new ViewSet();
-    const response = await viewset.html({
+    const response = await View.html({
       status: status,
       template: 'error',
       context: {
@@ -190,6 +156,12 @@ export class Server {
         res.writeHead(500, { 'Content-Type': mimeTypes.txt });
         res.end();
       }
+    }
+  }
+
+  viewset(viewset) {
+    for (const view of Object.values(viewset)) {
+      this.views.push(...view.routes.map((route) => [route, view]));
     }
   }
 
